@@ -1,11 +1,10 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use App\Models\Reservasi;
 use App\Models\Kamar;
-use Illuminate\Http\Request;
+use App\Models\Reservasi;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class ReservasiController extends Controller
 {
@@ -17,9 +16,9 @@ class ReservasiController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'id_kamar' => 'required|exists:kamars,id_kamar',
-            'tgl_checkin' => 'required|date|after_or_equal:today',
-            'tgl_checkout' => 'required|date|after:tgl_checkin',
+            'id_kamar'           => 'required|exists:kamars,id_kamar',
+            'tgl_checkin'        => 'required|date|after_or_equal:today',
+            'tgl_checkout'       => 'required|date|after:tgl_checkin',
             'fasilitas_tambahan' => 'nullable|string',
         ]);
 
@@ -30,11 +29,11 @@ class ReservasiController extends Controller
             ->where('status_reservasi', '!=', 'dibatalkan')
             ->where(function ($q) use ($request) {
                 $q->whereBetween('tgl_checkin', [$request->tgl_checkin, $request->tgl_checkout])
-                  ->orWhereBetween('tgl_checkout', [$request->tgl_checkin, $request->tgl_checkout])
-                  ->orWhere(function ($q2) use ($request) {
-                      $q2->where('tgl_checkin', '<=', $request->tgl_checkin)
-                         ->where('tgl_checkout', '>=', $request->tgl_checkout);
-                  });
+                    ->orWhereBetween('tgl_checkout', [$request->tgl_checkin, $request->tgl_checkout])
+                    ->orWhere(function ($q2) use ($request) {
+                        $q2->where('tgl_checkin', '<=', $request->tgl_checkin)
+                            ->where('tgl_checkout', '>=', $request->tgl_checkout);
+                    });
             })
             ->exists();
 
@@ -42,7 +41,7 @@ class ReservasiController extends Controller
             return back()->withErrors(['error' => 'Kamar sudah dipesan untuk tanggal yang dipilih.'])->withInput();
         }
 
-        $hari = Carbon::parse($request->tgl_checkin)->diffInDays(Carbon::parse($request->tgl_checkout));
+        $hari  = Carbon::parse($request->tgl_checkin)->diffInDays(Carbon::parse($request->tgl_checkout));
         $total = $hari * $kamar->harga_per_malam;
 
         $reservasi = Reservasi::create([
@@ -76,8 +75,8 @@ class ReservasiController extends Controller
         $this->authorizeReservasi($reservasi);
 
         $request->validate([
-            'tgl_checkin' => 'required|date|after_or_equal:today',
-            'tgl_checkout' => 'required|date|after:tgl_checkin',
+            'tgl_checkin'        => 'required|date|after_or_equal:today',
+            'tgl_checkout'       => 'required|date|after:tgl_checkin',
             'fasilitas_tambahan' => 'nullable|string',
         ]);
 
@@ -87,11 +86,11 @@ class ReservasiController extends Controller
             ->where('status_reservasi', '!=', 'dibatalkan')
             ->where(function ($q) use ($request) {
                 $q->whereBetween('tgl_checkin', [$request->tgl_checkin, $request->tgl_checkout])
-                  ->orWhereBetween('tgl_checkout', [$request->tgl_checkin, $request->tgl_checkout])
-                  ->orWhere(function ($q2) use ($request) {
-                      $q2->where('tgl_checkin', '<=', $request->tgl_checkin)
-                         ->where('tgl_checkout', '>=', $request->tgl_checkout);
-                  });
+                    ->orWhereBetween('tgl_checkout', [$request->tgl_checkin, $request->tgl_checkout])
+                    ->orWhere(function ($q2) use ($request) {
+                        $q2->where('tgl_checkin', '<=', $request->tgl_checkin)
+                            ->where('tgl_checkout', '>=', $request->tgl_checkout);
+                    });
             })
             ->exists();
 
@@ -99,7 +98,7 @@ class ReservasiController extends Controller
             return back()->withErrors(['error' => 'Kamar sudah dipesan untuk tanggal yang dipilih.'])->withInput();
         }
 
-        $hari = Carbon::parse($request->tgl_checkin)->diffInDays(Carbon::parse($request->tgl_checkout));
+        $hari  = Carbon::parse($request->tgl_checkin)->diffInDays(Carbon::parse($request->tgl_checkout));
         $kamar = Kamar::find($reservasi->id_kamar);
         $total = $hari * $kamar->harga_per_malam;
 
@@ -147,5 +146,12 @@ class ReservasiController extends Controller
             return;
         }
         abort(403);
+    }
+    public function adminShow(Reservasi $reservasi)
+    {
+        abort_if(! auth('admin')->check(), 403, 'Akses hanya untuk admin.');
+
+        $reservasi->load(['user', 'kamar', 'pembayaran']);
+        return view('admin.reservasis.show', compact('reservasi'));
     }
 }

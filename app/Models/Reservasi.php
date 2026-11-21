@@ -23,9 +23,9 @@ class Reservasi extends Model
     protected function casts(): array
     {
         return [
-            'tgl_checkin' => 'date',
+            'tgl_checkin'  => 'date',
             'tgl_checkout' => 'date',
-            'total_bayar' => 'decimal:2',
+            'total_bayar'  => 'decimal:2',
         ];
     }
 
@@ -51,5 +51,9 @@ class Reservasi extends Model
             'id_reservasi',
             'id_reservasi'
         );
+    }
+    public function getRouteKeyName(): string
+    {
+        return 'id_reservasi';
     }
 }

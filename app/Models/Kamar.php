@@ -1,11 +1,12 @@
 <?php
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Model;
+
 class Kamar extends Model
 {
-    protected $table = 'kamars';
+    protected $table      = 'kamars';
     protected $primaryKey = 'id_kamar';
-    
 
     protected $fillable = [
         'no_kamar',
@@ -21,5 +22,9 @@ class Kamar extends Model
             'id_kamar',
             'id_kamar'
         );
+    }
+    public function getRouteKeyName(): string
+    {
+        return 'id_kamar';
     }
 }

@@ -1,0 +1,70 @@
+@extends('layouts.app')
+
+@section('title', 'Detail Reservasi Admin')
+
+@section('content')
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Detail Reservasi</h2>
+        <a href="{{ route('admin.reservasis.index') }}" class="btn btn-secondary">Kembali</a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Reservasi #{{ $reservasi->id_reservasi }}</h5>
+            
+            <div class="row g-3 mt-3">
+                <div class="col-md-6">
+                    <p><strong>Pelanggan:</strong> {{ $reservasi->user->nama_lengkap }}</p>
+                    <p><strong>Email:</strong> {{ $reservasi->user->email }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Kamar:</strong> {{ $reservasi->kamar->no_kamar }}</p>
+                    <p><strong>Tipe:</strong> {{ $reservasi->kamar->tipe_kamar }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Check-in:</strong> {{ $reservasi->tgl_checkin }}</p>
+                    <p><strong>Check-out:</strong> {{ $reservasi->tgl_checkout }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Total Bayar:</strong> Rp {{ number_format($reservasi->total_bayar, 0, ',', '.') }}</p>
+                    <p><strong>Status Reservasi:</strong> 
+                        <span class="badge bg-{{ $reservasi->status_reservasi === 'dikonfirmasi' ? 'success' : ($reservasi->status_reservasi === 'menunggu' ? 'warning' : 'danger') }}">
+                            {{ ucfirst($reservasi->status_reservasi) }}
+                        </span>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    @if($reservasi->fasilitas_tambahan)
+                        <p><strong>Fasilitas Tambahan:</strong> {{ $reservasi->fasilitas_tambahan }}</p>
+                    @endif
+                </div>
+            </div>
+
+            <hr>
+
+            @if($reservasi->pembayaran)
+                <div class="alert alert-info">
+                    <h6>Pembayaran</h6>
+                    <p><strong>Jumlah:</strong> Rp {{ number_format($reservasi->pembayaran->jumlah_bayar, 0, ',', '.') }}</p>
+                    <p><strong>Tanggal Bayar:</strong> {{ $reservasi->pembayaran->tgl_bayar ?? '-' }}</p>
+                    <p><strong>Status:</strong> 
+                        <span class="badge bg-{{ $reservasi->pembayaran->status_pembayaran === 'diterima' ? 'success' : ($reservasi->pembayaran->status_pembayaran === 'ditolak' ? 'danger' : 'warning') }}">
+                            {{ ucfirst($reservasi->pembayaran->status_pembayaran) }}
+                        </span>
+                    </p>
+                    @if($reservasi->pembayaran->bukti_transfer)
+                        <a href="{{ asset('storage/'.$reservasi->pembayaran->bukti_transfer) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-file-image"></i> Lihat Bukti Transfer
+                        </a>
+                    @endif
+                </div>
+            @else
+                <div class="alert alert-warning">
+                    Belum ada pembayaran untuk reservasi ini.
+                </div>
+            @endif
+        </div>
+    </div>
+</div>
+@endsection

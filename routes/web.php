@@ -16,34 +16,40 @@ Route::get('/', function () {
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.process');
 
-// Logout (tanpa middleware guard)
+// Logout
 Route::post('/logout/admin', [AuthController::class, 'logoutAdmin'])->name('admin.logout');
 Route::post('/logout/user', [AuthController::class, 'logoutUser'])->name('user.logout');
 
 // === ADMIN ROUTES ===
-Route::middleware('guard:admin')->prefix('admin')->name('admin.')->group(function () {
+Route::middleware('admin.guard:admin')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'admin'])->name('dashboard');
 
     // Kamar CRUD (admin)
-    Route::resource('/kamars', KamarController::class)->except(['show']);
+    Route::get('/kamars', [KamarController::class, 'adminIndex'])->name('kamars.index');
+    Route::get('/kamars/create', [KamarController::class, 'create'])->name('kamars.create');
+    Route::post('/kamars', [KamarController::class, 'store'])->name('kamars.store');
+    Route::get('/kamars/{kamar}/edit', [KamarController::class, 'edit'])->name('kamars.edit');
+    Route::put('/kamars/{kamar}', [KamarController::class, 'update'])->name('kamars.update');
+    Route::delete('/kamars/{kamar}', [KamarController::class, 'destroy'])->name('kamars.destroy');
 
-    // Kelola reservasi (admin)
+    // Reservasi admin
     Route::get('/reservasis', [ReservasiController::class, 'adminIndex'])->name('reservasis.index');
     Route::put('/reservasis/{reservasi}', [ReservasiController::class, 'adminUpdate'])->name('reservasis.update');
 
-    // Verifikasi pembayaran (admin)
+    // Pembayaran admin
     Route::get('/pembayarans', [PembayaranController::class, 'adminIndex'])->name('pembayarans.index');
     Route::put('/pembayarans/{pembayaran}/verifikasi', [PembayaranController::class, 'verifikasi'])->name('pembayarans.verifikasi');
+    Route::get('/reservasis/{reservasi}', [ReservasiController::class, 'adminShow'])->name('admin.reservasis.show');    
 
     // Laporan
     Route::get('/laporan', [\App\Http\Controllers\LaporanController::class, 'index'])->name('laporan');
 });
 
-// === USER (PELANGGAN) ROUTES ===
-Route::middleware('guard:web')->group(function () {
+// === PELANGGAN ROUTES ===
+Route::middleware('web.guard:web')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'user'])->name('user.dashboard');
 
-    // Lihat kamar (publik dalam grup auth)
+    // Kamar (hanya lihat tersedia)
     Route::get('/kamars', [KamarController::class, 'index'])->name('kamars.index');
     Route::get('/kamars/{kamar}', [KamarController::class, 'show'])->name('kamars.show');
 

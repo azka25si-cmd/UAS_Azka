@@ -34,4 +34,8 @@ class Admin extends Authenticatable
             'id_admin'
         );
     }
+    public function getRouteKeyName(): string
+    {
+        return 'id_admin';
+    }
 }

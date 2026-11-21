@@ -1,12 +1,12 @@
 <?php
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Model;
 
 class Pembayaran extends Model
 {
-    protected $table = 'pembayarans';
+    protected $table      = 'pembayarans';
     protected $primaryKey = 'id_pembayaran';
-    
 
     protected $fillable = [
         'id_reservasi',
@@ -20,7 +20,7 @@ class Pembayaran extends Model
     protected function casts(): array
     {
         return [
-            'tgl_bayar' => 'date',
+            'tgl_bayar'    => 'date',
             'jumlah_bayar' => 'decimal:2',
         ];
     }
@@ -41,5 +41,9 @@ class Pembayaran extends Model
             'id_admin',
             'id_admin'
         );
+    }
+    public function getRouteKeyName(): string
+    {
+        return 'id_pembayaran';
     }
 }
