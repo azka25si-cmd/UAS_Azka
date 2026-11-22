@@ -39,10 +39,10 @@ Route::middleware('admin.guard:admin')->prefix('admin')->name('admin.')->group(f
     // Pembayaran admin
     Route::get('/pembayarans', [PembayaranController::class, 'adminIndex'])->name('pembayarans.index');
     Route::put('/pembayarans/{pembayaran}/verifikasi', [PembayaranController::class, 'verifikasi'])->name('pembayarans.verifikasi');
-    Route::get('/reservasis/{reservasi}', [ReservasiController::class, 'adminShow'])->name('admin.reservasis.show');    
+    Route::get('/reservasis/{reservasi}', [ReservasiController::class, 'adminShow'])->name('reservasis.show');    
 
     // Laporan
-    Route::get('/laporan', [\App\Http\Controllers\LaporanController::class, 'index'])->name('laporan');
+    //Route::get('/laporan', [\App\Http\Controllers\LaporanController::class, 'index'])->name('laporan');
 });
 
 // === PELANGGAN ROUTES ===

@@ -22,7 +22,7 @@ class DashboardController extends Controller
     public function user()
     {
         $user = auth('web')->user();
-        $reservasis = $user->reservasis()->with(['kamar', 'pembayaran'])->get();
+        $reservasis = $user->reservasis()->with(['kamar', 'pembayarans'])->get();
 
         return view('user.dashboard', compact('reservasis'));
     }

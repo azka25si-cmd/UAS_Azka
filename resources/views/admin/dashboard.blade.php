@@ -1,89 +1,18 @@
-@extends('layouts.app')
-
-@section('title', 'Dashboard Admin')
-
+@extends('layouts.admin.app')
+@section('title','Dashboard Admin')
+@section('page-heading','Dashboard')
 @section('content')
-<div class="container-fluid mt-4">
-    <h2>Selamat Datang, Admin</h2>
-    <p class="text-muted">Selamat datang di halaman manajemen Wisma Kita.</p>
-
-    <div class="row mt-4">
-        <div class="col-md-3">
-            <div class="card text-white bg-primary mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Kamar Tersedia</h5>
-                    <p class="card-text display-4">{{ $kamars->where('status_kamar', 'tersedia')->count() }}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-success mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Total Reservasi</h5>
-                    <p class="card-text display-4">{{ $reservasis->count() }}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-warning mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Menunggu Pembayaran</h5>
-                    <p class="card-text display-4">{{ $pembayarans->where('status_pembayaran', 'menunggu')->count() }}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-info mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Total Pelanggan</h5>
-                    <p class="card-text display-4">{{ $users->count() }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">Reservasi Terbaru</h5>
-                </div>
-                <div class="card-body">
-                    <table class="table table-sm table-striped">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Pelanggan</th>
-                                <th>Kamar</th>
-                                <th>Check-in</th>
-                                <th>Check-out</th>
-                                <th>Status</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($reservasis->take(5) as $index => $r)
-                                <tr>
-                                    <td>{{ $index + 1 }}</td>
-                                    <td>{{ $r->user->nama_lengkap }}</td>
-                                    <td>{{ $r->kamar->no_kamar }}</td>
-                                    <td>{{ $r->tgl_checkin }}</td>
-                                    <td>{{ $r->tgl_checkout }}</td>
-                                    <td>
-                                        <span class="badge bg-{{ $r->status_reservasi === 'dikonfirmasi' ? 'success' : ($r->status_reservasi === 'menunggu' ? 'warning' : 'danger') }}">
-                                            {{ ucfirst($r->status_reservasi) }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <a href="{{ route('admin.reservasis.update', $r->id_reservasi) }}" class="btn btn-sm btn-outline-primary">Edit</a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="page-heading"><div><h1>Dashboard</h1><p>Ringkasan pengelolaan kamar dan reservasi Wisma Kita.</p></div><span class="badge rounded-pill badge-soft px-3 py-2"><i class="bi bi-calendar3 me-1"></i>{{ now()->translatedFormat('d F Y') }}</span></div>
+<div class="row g-3 mb-4">
+<div class="col-12 col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-icon"><i class="bi bi-door-closed"></i></div><div class="stat-label">Total Kamar</div><div class="stat-value">{{ $kamars->count() }}</div></div></div>
+<div class="col-12 col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-icon"><i class="bi bi-check2-circle"></i></div><div class="stat-label">Kamar Tersedia</div><div class="stat-value">{{ $kamars->where('status_kamar','tersedia')->count() }}</div></div></div>
+<div class="col-12 col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-icon"><i class="bi bi-calendar-check"></i></div><div class="stat-label">Total Reservasi</div><div class="stat-value">{{ $reservasis->count() }}</div></div></div>
+<div class="col-12 col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-icon"><i class="bi bi-people"></i></div><div class="stat-label">Pelanggan Terdaftar</div><div class="stat-value">{{ $users->count() }}</div></div></div>
 </div>
+<div class="content-card"><div class="card-heading"><h2><i class="bi bi-clock-history me-2"></i>Reservasi Terbaru</h2><a href="{{ route('admin.reservasis.index') }}" class="btn btn-outline-green btn-sm">Lihat semua</a></div>
+<div class="table-responsive"><table class="table"><thead><tr><th>No.</th><th>Pelanggan</th><th>Kamar</th><th>Check-in</th><th>Check-out</th><th>Status</th><th>Aksi</th></tr></thead><tbody>
+@forelse($reservasis->sortByDesc('created_at')->take(5) as $r)
+<tr><td>{{ $loop->iteration }}</td><td>{{ $r->user->nama_lengkap ?? '-' }}</td><td>{{ $r->kamar->no_kamar ?? '-' }}</td><td>{{ $r->tgl_checkin ? \Carbon\Carbon::parse($r->tgl_checkin)->format('d/m/Y') : '-' }}</td><td>{{ $r->tgl_checkout ? \Carbon\Carbon::parse($r->tgl_checkout)->format('d/m/Y') : '-' }}</td><td><span class="badge badge-soft">{{ ucfirst($r->status_reservasi ?? '-') }}</span></td><td><a href="{{ route('admin.reservasis.show',$r->id_reservasi) }}" class="btn btn-outline-green btn-sm">Detail</a></td></tr>
+@empty<tr><td colspan="7" class="text-center text-muted py-5">Belum ada data reservasi.</td></tr>@endforelse
+</tbody></table></div></div>
 @endsection

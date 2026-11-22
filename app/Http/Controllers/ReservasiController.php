@@ -151,7 +151,8 @@ class ReservasiController extends Controller
     {
         abort_if(! auth('admin')->check(), 403, 'Akses hanya untuk admin.');
 
-        $reservasi->load(['user', 'kamar', 'pembayaran']);
+        $reservasi->load(['user', 'kamar', 'pembayarans']);
+
         return view('admin.reservasis.show', compact('reservasi'));
     }
 }
