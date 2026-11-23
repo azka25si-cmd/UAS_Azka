@@ -9,6 +9,17 @@ class AuthController extends Controller
     // Menampilkan halaman login
     public function showLogin()
     {
+        // Jika admin masih login
+        if (auth('admin')->check()) {
+            return redirect()->route('admin.dashboard');
+        }
+
+        // Jika pelanggan masih login
+        if (auth('web')->check()) {
+            return redirect()->route('user.dashboard');
+        }
+
+        // Jika belum login, tampilkan halaman login
         return view('auth.login');
     }
 
@@ -17,11 +28,15 @@ class AuthController extends Controller
     {
         $request->validate([
             'account_type' => 'required|in:admin,user',
-            'identity' => 'required|string',
-            'password' => 'required|string',
+            'identity'     => 'required|string',
+            'password'     => 'required|string',
         ]);
 
         $accountType = $request->account_type;
+
+        // Logout kedua guard agar tidak ada sesi akun sebelumnya
+        Auth::guard('admin')->logout();
+        Auth::guard('web')->logout();
 
         // Menentukan guard dan kredensial
         if ($accountType === 'admin') {
@@ -41,13 +56,13 @@ class AuthController extends Controller
 
             $credentials = [
                 $identityField => $request->identity,
-                'password' => $request->password,
+                'password'     => $request->password,
             ];
         }
 
         // Memeriksa akun dan password
-        Auth::guard($guard)->logout();
         if (Auth::guard($guard)->attempt($credentials)) {
+
             $request->session()->regenerate();
 
             if ($accountType === 'admin') {

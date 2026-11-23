@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Kamar;
@@ -11,7 +10,7 @@ class KamarController extends Controller
     public function adminIndex()
     {
         abort_if(!auth('admin')->check(), 403, 'Akses hanya untuk admin.');
-        
+
         $kamars = Kamar::all();
         return view('admin.kamars.index', compact('kamars'));
     }
@@ -25,7 +24,7 @@ class KamarController extends Controller
     public function store(Request $request)
     {
         abort_if(!auth('admin')->check(), 403, 'Akses hanya untuk admin.');
-        
+
         $request->validate([
             'no_kamar' => 'required|unique:kamars,no_kamar',
             'tipe_kamar' => 'required|string',
@@ -46,7 +45,7 @@ class KamarController extends Controller
     public function update(Request $request, Kamar $kamar)
     {
         abort_if(!auth('admin')->check(), 403, 'Akses hanya untuk admin.');
-        
+
         $request->validate([
             'no_kamar' => 'required|unique:kamars,no_kamar,'.$kamar->id_kamar.',id_kamar',
             'tipe_kamar' => 'required|string',
@@ -69,7 +68,7 @@ class KamarController extends Controller
     public function index()
     {
         abort_if(!auth('web')->check(), 403, 'Akses hanya untuk pelanggan.');
-        
+
         $kamars = Kamar::where('status_kamar', 'tersedia')->get();
         return view('kamars.index', compact('kamars'));
     }
